@@ -8,7 +8,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +17,6 @@ jobs:
         uses: devcontainers/action@v1
         with:
           publish-features: true
-          generate-docs: true
+          generate-docs: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
