@@ -1,0 +1,22 @@
+name: Publish Features
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish Features
+        uses: devcontainers/action@v1
+        with:
+          publish-features: true
+          generate-docs: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,19 @@
+name: Test Features
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test Features
+        uses: devcontainers/action@v1
+        with:
+          features: human
+          base-image: mcr.microsoft.com/devcontainers/base:ubuntu

@@ -1,0 +1,15 @@
+{
+  "id": "human",
+  "version": "1.0.0",
+  "name": "human CLI",
+  "description": "Installs the human CLI — issue tracker interface for AI agents",
+  "documentationURL": "https://github.com/StephanSchmidt/treehouse",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Version of the human CLI to install (e.g. '0.4.0' or 'latest')"
+    }
+  },
+  "installsAfter": ["ghcr.io/devcontainers/features/common-utils"]
+}
