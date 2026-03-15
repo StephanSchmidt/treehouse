@@ -6,6 +6,7 @@ set -eu
 
 REPO="StephanSchmidt/human"
 VERSION="${VERSION:-latest}"
+PROXY="${PROXY:-false}"
 
 fail() { printf 'Error: %s\n' "$1" >&2; exit 1; }
 
@@ -67,3 +68,44 @@ install -d /usr/local/bin
 install "${TMPDIR}/human" /usr/local/bin/human
 
 printf 'human %s installed to /usr/local/bin/human\n' "$VERSION"
+
+# --- optional HTTPS proxy setup ----------------------------------------------
+if [ "$PROXY" = "true" ]; then
+    printf 'Installing HTTPS proxy support...\n'
+
+    # Install iptables if missing.
+    if ! command -v iptables >/dev/null 2>&1; then
+        apt-get update -y && apt-get install -y --no-install-recommends iptables
+    fi
+
+    # Drop a script that reads HUMAN_PROXY_ADDR at runtime.
+    cat > /usr/local/bin/human-proxy-setup <<'SCRIPT'
+#!/bin/sh
+set -eu
+
+ADDR="${HUMAN_PROXY_ADDR:-}"
+if [ -z "$ADDR" ]; then
+    printf 'HUMAN_PROXY_ADDR is not set, skipping proxy setup.\n'
+    exit 0
+fi
+
+HOST="${ADDR%:*}"
+
+# DNAT: redirect outbound HTTPS to the proxy (idempotent).
+iptables -t nat -C OUTPUT -p tcp --dport 443 \
+    ! -d "$HOST" \
+    -j DNAT --to-destination "$ADDR" 2>/dev/null \
+|| iptables -t nat -A OUTPUT -p tcp --dport 443 \
+    ! -d "$HOST" \
+    -j DNAT --to-destination "$ADDR"
+
+# MASQUERADE: ensure return packets route correctly.
+iptables -t nat -C POSTROUTING -j MASQUERADE 2>/dev/null \
+|| iptables -t nat -A POSTROUTING -j MASQUERADE
+
+printf 'HTTPS proxy redirect active → %s\n' "$ADDR"
+SCRIPT
+    chmod +x /usr/local/bin/human-proxy-setup
+
+    printf 'Proxy support installed. Set HUMAN_PROXY_ADDR and run "human-proxy-setup" at container start.\n'
+fi
