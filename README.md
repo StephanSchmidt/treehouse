@@ -1,14 +1,10 @@
 # treehouse
 
-Devcontainer Features for the [human CLI](https://github.com/StephanSchmidt/human).
+Devcontainer Feature for the [human CLI](https://github.com/StephanSchmidt/human) — an issue tracker interface for AI agents.
 
-## Features
+This repo provides a devcontainer feature that installs `human` into any devcontainer, with optional HTTPS proxy support for controlling outbound network access.
 
-### `human`
-
-Installs the `human` CLI — issue tracker interface for AI agents.
-
-#### Usage
+## Quick start
 
 Add to your `devcontainer.json`:
 
@@ -20,14 +16,16 @@ Add to your `devcontainer.json`:
 }
 ```
 
-#### Options
+This installs the latest `human` CLI into the container.
 
-| Option    | Type    | Default    | Description                                                                 |
-|-----------|---------|------------|-----------------------------------------------------------------------------|
-| `version` | string  | `"latest"` | Version of the human CLI (e.g. `"0.4.0"` or `"latest"`)                    |
-| `proxy`   | boolean | `false`    | Install HTTPS proxy support (iptables + setup script). Requires NET_ADMIN.  |
+## Options
 
-#### Example with pinned version
+| Option    | Type    | Default    | Description                                                                |
+|-----------|---------|------------|----------------------------------------------------------------------------|
+| `version` | string  | `"latest"` | Version of the human CLI (e.g. `"0.4.0"` or `"latest"`)                   |
+| `proxy`   | boolean | `false`    | Install HTTPS proxy support (iptables + setup script). Requires NET_ADMIN. |
+
+### Pinned version
 
 ```json
 {
@@ -92,7 +90,7 @@ Copy the `HUMAN_PROXY_ADDR` from the output.
   "capAdd": ["NET_ADMIN"],
   "remoteEnv": {
     "HUMAN_DAEMON_ADDR": "localhost:19285",
-    "HUMAN_DAEMON_TOKEN": "<paste from 'human daemon token'>",
+    "HUMAN_DAEMON_TOKEN": "${localEnv:HUMAN_DAEMON_TOKEN}",
     "HUMAN_CHROME_ADDR": "localhost:19286",
     "HUMAN_PROXY_ADDR": "${localEnv:HUMAN_PROXY_ADDR}"
   },
@@ -103,19 +101,11 @@ Copy the `HUMAN_PROXY_ADDR` from the output.
 
 The `proxy: true` option installs `iptables` and the `human-proxy-setup` script at build time. At container start, `human-proxy-setup` reads `HUMAN_PROXY_ADDR` and sets up the iptables redirect. If `HUMAN_PROXY_ADDR` is not set, the script skips gracefully.
 
-## Test devcontainer
+## Using this repo as a devcontainer
 
-The `test-devcontainer/` directory contains a ready-to-use devcontainer for testing. Build a fresh `human` binary, start the daemon, and open the devcontainer:
+This repo includes a `.devcontainer` configuration, so you can open it directly in VS Code or any devcontainer-compatible tool. The container comes with the `human` CLI and proxy support pre-configured — just set the required environment variables on your host before opening:
 
 ```bash
-# Build the binary
-cd /path/to/human/cli
-go build -o /path/to/treehouse/test-devcontainer/human .
-
-# Start the daemon
+export HUMAN_DAEMON_TOKEN=$(human daemon token)
 export HUMAN_PROXY_ADDR=$(human daemon start 2>&1 | grep HUMAN_PROXY_ADDR | awk -F= '{print $2}')
-
-# Open the devcontainer
-cd /path/to/treehouse/test-devcontainer
-devcontainer up --workspace-folder .
 ```
