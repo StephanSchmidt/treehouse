@@ -11,7 +11,8 @@
     "HUMAN_DAEMON_ADDR": "localhost:19285",
     "HUMAN_DAEMON_TOKEN": "${localEnv:HUMAN_DAEMON_TOKEN}",
     "HUMAN_CHROME_ADDR": "localhost:19286",
-    "HUMAN_PROXY_ADDR": "${localEnv:HUMAN_PROXY_ADDR}"
+    "HUMAN_PROXY_ADDR": "${localEnv:HUMAN_PROXY_ADDR}",
+    "BROWSER": "human-browser"
   },
   "postStartCommand": "sudo human-proxy-setup"
 }

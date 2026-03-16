@@ -1,6 +1,6 @@
 {
   "id": "human",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "name": "human CLI",
   "description": "Installs the human CLI — issue tracker interface for AI agents",
   "documentationURL": "https://github.com/StephanSchmidt/treehouse",
@@ -15,6 +15,9 @@
       "default": false,
       "description": "Install HTTPS proxy support (iptables + setup script). Set HUMAN_PROXY_ADDR env var and run human-proxy-setup at container start. Requires NET_ADMIN capability."
     }
+  },
+  "containerEnv": {
+    "BROWSER": "human-browser"
   },
   "installsAfter": ["ghcr.io/devcontainers/features/common-utils"]
 }

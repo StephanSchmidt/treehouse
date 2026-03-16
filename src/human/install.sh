@@ -66,6 +66,8 @@ tar -xzf "${TMPDIR}/${ARCHIVE}" -C "$TMPDIR"
 
 install -d /usr/local/bin
 install "${TMPDIR}/human" /usr/local/bin/human
+ln -sf /usr/local/bin/human /usr/local/bin/human-browser
+printf 'human-browser symlink created\n'
 
 printf 'human %s installed to /usr/local/bin/human\n' "$VERSION"
 

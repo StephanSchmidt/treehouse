@@ -41,6 +41,17 @@ This installs the latest `human` CLI into the container.
 
 AI agents inside devcontainers typically use `human` in daemon mode, where credentials stay on the host. See the [human CLI docs](https://github.com/StephanSchmidt/human#devcontainer--remote-mode) for setup instructions.
 
+## OAuth / browser support
+
+Tools like Claude Code require OAuth authentication, which needs to open a browser on the host machine. The Feature handles this automatically:
+
+- A `human-browser` symlink is created pointing to the `human` CLI (busybox-style dispatch)
+- The `BROWSER` environment variable is set to `human-browser` via `containerEnv`
+- When Claude Code triggers OAuth, `human-browser` forwards the browser-open request to the daemon on the host
+- The daemon opens the real browser, binds the OAuth redirect port, and relays the callback back to the container
+
+No additional configuration is needed — this works out of the box when the daemon is running on the host.
+
 ## HTTPS proxy
 
 The `human` daemon includes a transparent HTTPS proxy that filters outbound traffic from devcontainers using SNI-based domain matching — no certificates needed. This lets you control which external services an AI agent can reach.
@@ -92,7 +103,8 @@ Copy the `HUMAN_PROXY_ADDR` from the output.
     "HUMAN_DAEMON_ADDR": "localhost:19285",
     "HUMAN_DAEMON_TOKEN": "${localEnv:HUMAN_DAEMON_TOKEN}",
     "HUMAN_CHROME_ADDR": "localhost:19286",
-    "HUMAN_PROXY_ADDR": "${localEnv:HUMAN_PROXY_ADDR}"
+    "HUMAN_PROXY_ADDR": "${localEnv:HUMAN_PROXY_ADDR}",
+    "BROWSER": "human-browser"
   },
   "forwardPorts": [19285, 19286],
   "postStartCommand": "sudo human-proxy-setup"
